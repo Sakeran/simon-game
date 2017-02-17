@@ -11,11 +11,7 @@ html
     if testMode
       #qunit
       #qunit-fixture
-    h1 NPM Boilerplate
-    p.
-      This is some simple boilerplate code written in a basic NPM project, to make starting simple Javascript projects easier.
-    p.
-      Use #[strong 'npm run watch:all'] in the console at the root directory to start a test browser and begin watching the babel, pug, and scss files in the src/ directory.
+    include includes/main.pug
     - var app = testMode ? "../dist/" : "";
     - app += "app.js";
     script(type="application/javascript", src=app)

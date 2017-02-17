@@ -17,7 +17,7 @@
     "build:css": "npm run scss && npm run autoprefixer",
     "build:all": "npm run build:js && npm run pug && npm run build:css",
     "watch:css": "onchange src/*.scss -- npm run build:css",
-    "watch:pug": "onchange src/index.pug -- npm run pug",
+    "watch:pug": "onchange 'src/index.pug' 'src/includes/*.pug' -- npm run pug",
     "watch:js": "onchange src/*.babel -- npm run build:js",
     "watch:all": "parallelshell 'npm run serve' 'npm run watch:css' 'npm run watch:pug' 'npm run watch:js'"
   },
