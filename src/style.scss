@@ -1,3 +1,6 @@
+$btn-width: 95%;
+$btn-active: $btn-width * 0.9;
+
 body {
   background-color: gray;
 }
@@ -7,23 +10,43 @@ body {
   max-width: 600px;
   margin: 0 auto;
   text-align: center;
-  div {
-    display: inline-block;
-    margin: 2%;
-    width: 30%;
-    padding-bottom: 30%;
-    border-radius: 50%;
-    &.green {
-      background-color: green;
-    }
-    &.red {
-      background-color: red;
-    }
-    &.yellow {
-      background-color: yellow;
-    }
-    &.blue {
-      background-color: blue;
+  .row {
+    width: 100%;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .btn-container {
+      display: inline-block;
+      width: 30%;
+      @keyframes btn-bounce {
+        0% {width: $btn-width; padding-bottom: $btn-width;}
+        20% {width: $btn-active; padding-bottom: $btn-active;}
+        100% {width: $btn-width; padding-bottom: $btn-width;}
+      }
+      .button {
+        width: $btn-width;
+        padding-bottom: $btn-width;
+        margin: 0 auto;
+        border-radius: 50%;
+        &.green {
+          background-color: green;
+        }
+        &.red {
+          background-color: red;
+        }
+        &.yellow {
+          background-color: yellow;
+        }
+        &.blue {
+          background-color: blue;
+        }
+        &.active {
+          animation-name: btn-bounce;
+          animation-timing-function: linear;
+          animation-duration: 0.5s;
+        }
+      }
     }
   }
 }

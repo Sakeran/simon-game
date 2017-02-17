@@ -1,9 +1,16 @@
 .main-game
-  .green#green
-  .red#red
-  .yellow#yellow
-  .blue#blue
+  .row
+    .btn-container
+      .button.green#green
+    .btn-container
+      .button.red#red
+  .row
+    .btn-container
+      .button.yellow#yellow
+    .btn-container
+      .button.blue#blue
 .info-bar
   span Level: #[span#info-level --]
   span#info-strict No Strict Mode
 button#debug Debug
+p.debugLog Debug
