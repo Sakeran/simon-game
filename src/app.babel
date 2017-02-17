@@ -1,2 +1,75 @@
-let one = "two";
-console.log(one);
+let GAME = {
+  colors: ["green", "red", "blue", "yellow"],
+
+  // Basic Game Logic
+
+  setupGame: function setupGame(strictMode=false) {
+    // Resets the game object and initializes a new game.
+    this.strictMode = strictMode;
+    this.sequence = [];
+    for (let i = 0; i < 20; i++) {
+      let newColor = this.colors[Math.floor(Math.random()*this.colors.length)];
+      this.sequence.push(newColor);
+    }
+    this.playerLevel = 1;
+    this.playerSequence = [];
+  },
+  checkInput: function checkInput(inputArray) {
+    // Checks that the input array matches the current sequence up to
+    // its length. Returns true if it matches, else returns false.
+    for (let i = 0, len = inputArray.length; i < len; i++) {
+      if (inputArray[i] === this.sequence[i]) {
+        continue;
+      }
+      return false;
+    }
+    return true;
+  },
+  input: function input(color) {
+    // Validates input before adding it on to (a copy of) the user sequence.
+    // Then checks the input against the current sequence.
+    // Updates the playerLevel and userSequence if it matches, otherwise
+    // returns false.
+    if (!this.colors.includes(color)) {
+      return false;
+    }
+    let newSeq = this.playerSequence.slice(0);
+    newSeq.push(color);
+    if (this.checkInput(newSeq)) {
+      this.playerLevel++;
+      this.playerSequence = newSeq;
+      return true;
+    }
+    return false;
+  },
+
+  // Game/DOM Interface
+
+  init: function init() {
+    // Captures relevant DOM elements, and sets up listeners.
+    let colorButtons = document.querySelectorAll(".main-game div");
+    for (let i = 0, len = colorButtons.length; i < len; i++) {
+      let btn = colorButtons[i];
+      btn.addEventListener("mousedown", this.colorInput.bind(this, btn.id));
+    }
+  },
+
+  setLevelField: function setLevelField() {
+    let level = this.playerLevel || 0;
+    document.querySelector("#info-level").innerHTML = level;
+  },
+
+  setStrictField: function setStrictField() {
+    let res = "Strict Mode " + ((this.strictMode) ? "On" : "Off");
+    document.querySelector("#info-strict").innerHTML = res;
+  },
+
+  // Input Handling
+
+  colorInput: function colorInput(input) {
+    console.log(input);
+  },
+};
+
+GAME.init();
+GAME.setupGame();
