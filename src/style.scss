@@ -1,1 +1,40 @@
+body {
+  background-color: gray;
+}
 
+.main-game {
+  width: 90%;
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  div {
+    display: inline-block;
+    margin: 2%;
+    width: 30%;
+    padding-bottom: 30%;
+    border-radius: 50%;
+    &.green {
+      background-color: green;
+    }
+    &.red {
+      background-color: red;
+    }
+    &.yellow {
+      background-color: yellow;
+    }
+    &.blue {
+      background-color: blue;
+    }
+  }
+}
+
+.info-bar {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+  margin-top: 10px;
+  span {
+    display: inline-block;
+    width: 50%;
+  }
+}
