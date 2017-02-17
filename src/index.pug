@@ -1,0 +1,24 @@
+doctype html
+html
+  head
+    title NPM Boilerplate
+    - var defaultStyle = testMode ? "../dist/" : "";
+    - defaultStyle += "style.css";
+    if testMode
+      link(rel="stylesheet",href="https://code.jquery.com/qunit/qunit-2.1.1.css")
+    link(rel="stylesheet",href=defaultStyle)
+  body
+    if testMode
+      #qunit
+      #qunit-fixture
+    h1 NPM Boilerplate
+    p.
+      This is some simple boilerplate code written in a basic NPM project, to make starting simple Javascript projects easier.
+    p.
+      Use #[strong 'npm run watch:all'] in the console at the root directory to start a test browser and begin watching the babel, pug, and scss files in the src/ directory.
+    - var app = testMode ? "../dist/" : "";
+    - app += "app.js";
+    script(type="application/javascript", src=app)
+    if testMode
+      script(type="application/javascript", src="https://code.jquery.com/qunit/qunit-2.1.1.js")
+      script(type="application/javascript", src="tests.js")
