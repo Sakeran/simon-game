@@ -2,11 +2,13 @@ doctype html
 html
   head
     title Simon
+    meta(name="viewport", content="width=device-width,initial-scale=1, maximum-scale=1, user-scalable=0")
     - var defaultStyle = testMode ? "../dist/" : "";
     - defaultStyle += "style.css";
     if testMode
       link(rel="stylesheet",href="https://code.jquery.com/qunit/qunit-2.1.1.css")
     link(rel="stylesheet",href=defaultStyle)
+    script(type="application/javascript",src="assets/js/promise.min.js")
   body
     if testMode
       #qunit

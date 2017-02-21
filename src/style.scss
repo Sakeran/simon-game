@@ -29,6 +29,7 @@ body {
         padding-bottom: $btn-width;
         margin: 0 auto;
         border-radius: 50%;
+        z-index: 1;
         &.green {
           background-color: green;
         }

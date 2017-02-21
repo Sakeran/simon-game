@@ -13,8 +13,6 @@ let GAME = {
     }
     this.playerLevel = 1;
     this.playerSequence = [];
-    this.setLevelField();
-    this.setStrictField();
     this.pauseInput = true;
     this.playCurrentLevel();
   },
@@ -58,7 +56,7 @@ let GAME = {
     // the game state according to whether the input was valid or not.
     // Returns true if the input was correct/valid, or false if it was not.
 
-    if (!this.colors.includes(color)) {
+    if (this.colors.indexOf(color) == -1) {
       throw new Error("Tried to input an invalid color: "+color);
       return;
     }
@@ -115,6 +113,7 @@ let GAME = {
     let colorButtons = document.querySelectorAll(".button");
     for (let i = 0, len = colorButtons.length; i < len; i++) {
       let btn = colorButtons[i];
+      btn.addEventListener("touchstart", this.colorInput.bind(this, btn.id));
       btn.addEventListener("mousedown", this.colorInput.bind(this, btn.id));
     }
   },
@@ -172,7 +171,7 @@ let GAME = {
     }
     let baseClasses = "button " + color;
     let classes = target.getAttribute("class").split(" ");
-    if (!classes.includes("active")) {
+    if (classes.indexOf("active") == -1) {
       classes.push("active");
     } else {
       // If the class is already set, we'll want to restart the animation.
@@ -205,10 +204,10 @@ let GAME = {
     // Returns a promise that resolves after each step of the animation has
     // played.
     // Speed parameter is given in seconds, and converted to ms.
+    let sequence = this.sequence;
     level = level || sequence.length;
     speed = Math.floor(speed*1000) || 1000;
     let game = this;
-    let sequence = this.sequence;
     let animations = [];
     for (let i = 0; i < level; i++) {
       animations.push(new Promise(function(resolve, reject) {

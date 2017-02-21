@@ -6,7 +6,7 @@
   "scripts": {
     "test:pug": "pug src/index.pug -O {'testMode':true} -o tests ",
     "test": "npm run test:pug",
-    "clean": "rm -f dist/ && mkdir dist && mkdir dist/assets",
+    "clean": "rm -r dist/ && mkdir dist && mkdir dist/assets dist/assets/js dist/assets/img dist/assets/sounds",
     "scss": "node-sass --output-style compressed -o dist src",
     "autoprefixer": "postcss -u autoprefixer -r dist/*.css",
     "pug": "pug src/*.pug --out dist/",
@@ -15,7 +15,8 @@
     "serve": "browser-sync start --server --files dist/app.js dist/style.css dist/index.html",
     "build:js": "npm run lint && npm run babel",
     "build:css": "npm run scss && npm run autoprefixer",
-    "build:all": "npm run build:js && npm run pug && npm run build:css",
+    "build:assets": "cp -r src/assets/ dist",
+    "build:all": "npm run build:js && npm run pug && npm run build:css && npm run build:assets",
     "watch:css": "onchange src/*.scss -- npm run build:css",
     "watch:pug": "onchange 'src/index.pug' 'src/includes/*.pug' -- npm run pug",
     "watch:js": "onchange src/*.babel -- npm run build:js",
