@@ -18,7 +18,7 @@ body {
     justify-content: center;
     .btn-container {
       display: inline-block;
-      width: 30%;
+      width: 50%;
       @keyframes btn-bounce {
         0% {width: $btn-width; padding-bottom: $btn-width;}
         20% {width: $btn-active; padding-bottom: $btn-active;}

@@ -1,26 +1,38 @@
 let GAME = {
   colors: ["green", "red", "blue", "yellow"],
   pauseInput: true,
-  gameWin: false,
-  gameLoss: false,
 
   // Basic Game Logic
 
-  setupGame: function setupGame(strictMode=false) {
+  setupGame: function setupGame() {
     // Resets the game object and initializes a new game.
-    this.strictMode = this.strictMode || strictMode;
     this.sequence = [];
     for (let i = 0; i < 20; i++) {
       let newColor = this.colors[Math.floor(Math.random()*this.colors.length)];
       this.sequence.push(newColor);
     }
-    this.gameWin = false;
-    this.gameLoss = false;
     this.playerLevel = 1;
     this.playerSequence = [];
-    this.pauseInput = false;
     this.setLevelField();
     this.setStrictField();
+    this.pauseInput = true;
+    this.playCurrentLevel();
+  },
+
+  playCurrentLevel: function playCurrentLevel() {
+    // Sets pauseInput to true while the current level sequence plays,
+    // then sets it back to false to allow input.
+    // Should also set the UI components at this stage.
+
+    this.setLevelField();
+    this.setStrictField();
+    this.pauseInput = true;
+    // Wait one second before beginning the animation.
+    setTimeout(function() {
+      this.playSequence(this.playerLevel).then(function() {
+        this.pauseInput = false;
+      }.bind(this));
+    }.bind(this), 1000);
   },
 
   checkInput: function checkInput(inputArray) {
@@ -78,8 +90,10 @@ let GAME = {
     this.resetPlayerInput();
     if (this.playerLevel >= 20) {
       console.log("You win! Resetting the game.");
-      this.gameWin = true;
+      this.setupGame();
+      return;
     }
+    this.playCurrentLevel();
   },
 
   doFailureState: function doFailureState() {
@@ -91,6 +105,7 @@ let GAME = {
       return;
     }
     this.resetPlayerInput();
+    this.playCurrentLevel();
   },
 
   // Game/DOM Interface
@@ -150,6 +165,7 @@ let GAME = {
 
   animateButton: function animateButton(color) {
     // Plays the activation animation for the button of the given color.
+    // Returns a promise that resolves after the animation has played out
     let target = document.querySelector("." + color);
     if (!target) {
       return;
@@ -170,22 +186,42 @@ let GAME = {
       target = newTarget;
     }
     target.setAttribute("class", classes.join(" "));
-    // Clear the "active" class after a short interval.
-    setTimeout(function() {
-      if (target.getAttribute("class") == baseClasses) {
-        return;
-      }
-      target.setAttribute("class", baseClasses);
-    }, 600);
+
+    return new Promise(function(resolve, reject) {
+      // Clear the "active" class after a short interval.
+      setTimeout(function() {
+        if (target.getAttribute("class") == baseClasses) {
+          return;
+        }
+        target.setAttribute("class", baseClasses);
+        resolve(true);
+      }, 600);
+    });
   },
 
-  playSequence: function playSequence(level) {
+  playSequence: function playSequence(level, speed) {
     // Animates each button in the game sequence, up to the level specified.
     // Plays the entire animation if no level is given.
     // Returns a promise that resolves after each step of the animation has
     // played.
-    let sequence = this.sequence;
+    // Speed parameter is given in seconds, and converted to ms.
     level = level || sequence.length;
+    speed = Math.floor(speed*1000) || 1000;
+    let game = this;
+    let sequence = this.sequence;
+    let animations = [];
+    for (let i = 0; i < level; i++) {
+      animations.push(new Promise(function(resolve, reject) {
+        setTimeout(function() {
+          game.animateButton(sequence[i])
+          .then(function() {
+            resolve();
+          });
+        }, speed*i);
+      }));
+    }
+    let res = Promise.all(animations);
+    return res;
   },
 };
 
