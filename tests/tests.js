@@ -49,10 +49,10 @@ QUnit.test("Color button input", function(assert) {
   GAME.setupGame();
   GAME.pauseInput = true;
   var correct = GAME.sequence[0];
-  assert.notOk(GAME.colorInput(correct), "Ignores input while paused.");
+  assert.notOk(GAME.handleColorInput(correct), "Ignores input while paused.");
   GAME.playerSequence = [];
   GAME.pauseInput = false;
-  assert.ok(GAME.colorInput(correct), "Calls succeeed() correctly");
+  assert.ok(GAME.handleColorInput(correct), "Calls succeeed() correctly");
   var wrongInput =  getWrongColor(GAME.sequence[1]);
-  assert.notOk(GAME.colorInput(wrongInput),"Calls failure() correctly");
+  assert.notOk(GAME.handleColorInput(wrongInput),"Calls failure() correctly");
 });
