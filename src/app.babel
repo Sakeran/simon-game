@@ -70,7 +70,6 @@ let GAME = {
       // If it is as long as the current player level, increase player level.
       this.playerSequence = newSeq;
       if (this.playerSequence.length >= this.playerLevel) {
-        console.log("Increasing level");
         this.increasePlayerLevel();
       }
       return true;
@@ -89,7 +88,6 @@ let GAME = {
     this.playerLevel++;
     this.resetPlayerInput();
     if (this.playerLevel >= 20) {
-      console.log("You win! Resetting the game.");
       this.setupGame();
       return;
     }
@@ -132,17 +130,27 @@ let GAME = {
     }
     let sounds = this.colors.concat("wrong");
     let srcs = {
-      green: "assets/sounds/NFF-good-tip-high.wav",
-      red: "assets/sounds/NFF-good-tip-low.wav",
-      yellow: "assets/sounds/NFF-good-tip-high-2.wav",
-      blue: "assets/sounds/NFF-good-tip-low-2.wav",
-      wrong: "assets/sounds/NFF-wrong.wav",
+      green: "assets/sounds/NFF-good-tip-high.mp3",
+      red: "assets/sounds/NFF-good-tip-low.mp3",
+      yellow: "assets/sounds/NFF-good-tip-high-2.mp3",
+      blue: "assets/sounds/NFF-good-tip-low-2.mp3",
+      wrong: "assets/sounds/NFF-wrong.mp3",
     };
     this.gameSounds.green = new Audio();
+    this.gameSounds.green.play();
+
     this.gameSounds.red = new Audio();
+    this.gameSounds.red.play();
+
     this.gameSounds.yellow = new Audio();
+    this.gameSounds.yellow.play();
+
     this.gameSounds.blue = new Audio();
+    this.gameSounds.blue.play();
+
     this.gameSounds.wrong = new Audio();
+    this.gameSounds.wrong.play();
+
     this.gameSounds.loading = true;
     let promises = [];
     let game = this;
@@ -152,7 +160,6 @@ let GAME = {
           game.gameSounds[sounds[i]].oncanplaythrough = function() {
             resolve(true);
           };
-          game.gameSounds[sounds[i]].play();
           game.gameSounds[sounds[i]].src = srcs[sounds[i]];
         })
       );
@@ -223,13 +230,11 @@ let GAME = {
 
   inputSucceed: function inputSucceed(input) {
     // Play the sound effect corresponding to the button pressed.
-    console.log("Correct! Sound effect for "+input+" goes here.");
     this.playSound(input);
   },
 
   inputFail: function inputFail() {
     // Play the failure sound effect.
-    console.log("Failure! Sound effect for failure goes here.");
     this.playSound("wrong");
   },
 
