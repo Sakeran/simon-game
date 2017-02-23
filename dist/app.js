@@ -35,7 +35,7 @@ if(!this.started){this.startGame()}else{if(this.resetting){return}this.resetGame
 if(this.pauseInput||this.touchTimeout){return false}// If the event was a touchstart, prevent further color button inputs
 // for a short time, to prevent accidental double inputs on sensitve
 // screens that might lead to accidental player loss.
-if(isTouch){this.touchTimeout=true;console.log("touch timeout");setTimeout(function(){this.touchTimeout=false}.bind(this),300)}this.animateButton(input);var correct=this.input(input);// If the result was valid (correct), call inputSucceed()
+if(isTouch){this.touchTimeout=true;setTimeout(function(){this.touchTimeout=false}.bind(this),300)}this.animateButton(input);var correct=this.input(input);// If the result was valid (correct), call inputSucceed()
 // Otherwise, play the failure sound and call inputFail()
 if(correct){this.inputSucceed(input);return true}else{this.inputFail();return false}},inputSucceed:function inputSucceed(input){// Play the sound effect corresponding to the button pressed.
 this.playSound(input)},inputFail:function inputFail(){// Play the failure sound effect.

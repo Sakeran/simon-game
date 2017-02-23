@@ -256,7 +256,6 @@ let GAME = {
     // screens that might lead to accidental player loss.
     if (isTouch) {
       this.touchTimeout = true;
-      console.log("touch timeout");
       setTimeout(function() {
         this.touchTimeout = false;
       }.bind(this), 300);
