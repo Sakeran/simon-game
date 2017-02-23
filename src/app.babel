@@ -55,13 +55,13 @@ let GAME = {
     this.setLevelField();
     this.setStrictField();
     this.pauseInput = true;
-    // Wait one second before beginning the animation.
+    // Wait 1.5 seconds before beginning the animation.
     setTimeout(function() {
       this.playSequence(this.playerLevel)
       .then(function() {
         this.pauseInput = false;
       }.bind(this));
-    }.bind(this), 1000);
+    }.bind(this), 1500);
   },
 
   checkInput: function checkInput(inputArray) {
@@ -128,7 +128,7 @@ let GAME = {
     // reset the game entirely. Otherwise, just clear the player's input
     // array.
     if (this.strictMode) {
-      this.setupGame();
+      this.resetGame();
       return;
     }
     this.resetPlayerInput();
@@ -237,9 +237,12 @@ let GAME = {
 
   handleStrictBtn: function handleStrictBtn() {
     this.strictMode = !this.strictMode;
+    let btn = document.querySelector("#info-strict");
+    let classes = this.strictMode ? "strict" : "";
     let msg = "Strict Mode ";
     msg += this.strictMode ? "On" : "Off";
-    document.querySelector("#info-strict").innerHTML = msg;
+    btn.innerHTML = msg;
+    btn.setAttribute("class", classes);
   },
 
   handleColorInput: function handleColorInput(input, isTouch) {

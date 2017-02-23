@@ -12,7 +12,7 @@ html
       #qunit-fixture
     include includes/main.pug
     - var app = testMode ? "../dist/" : "";
-    - app += "app.js";
+    - app += "app.min.js";
     script(type="application/javascript", src=app)
     if testMode
       script(type="application/javascript", src="https://code.jquery.com/qunit/qunit-2.1.1.js")

@@ -12,8 +12,9 @@
     "pug": "pug src/*.pug --out dist/",
     "lint": "eslint src/*.babel",
     "babel": "babel src/app.babel --minified -o dist/app.js",
+    "uglify": "uglifyjs dist/app.js -m -o dist/app.min.js",
     "serve": "browser-sync start --server --files dist/app.js dist/style.css dist/index.html",
-    "build:js": "npm run lint && npm run babel",
+    "build:js": "npm run lint && npm run babel && npm run uglify",
     "build:css": "npm run scss && npm run autoprefixer",
     "build:assets": "cp -r src/assets/ dist",
     "build:all": "npm run build:js && npm run pug && npm run build:css && npm run build:assets",
@@ -36,6 +37,7 @@
     "onchange": "^3.2.1",
     "parallelshell": "^2.0.0",
     "postcss-cli": "^2.6.0",
-    "pug-cli": "^1.0.0-alpha6"
+    "pug-cli": "^1.0.0-alpha6",
+    "uglify-js": "^2.7.5"
   }
 }

@@ -5,8 +5,8 @@ this.started=true;this.setMainBtn("Loading...");var game=this;this.initSounds().
 this.pauseInput=true;this.resetting=true;this.animationId=-1;this.setMainBtn("Loading...");setTimeout(function(){this.setupGame();this.setMainBtn("Reset");this.resetting=false}.bind(this),1500)},playCurrentLevel:function playCurrentLevel(){// Sets pauseInput to true while the current level sequence plays,
 // then sets it back to false to allow input.
 // Should also set the UI components at this stage.
-this.setLevelField();this.setStrictField();this.pauseInput=true;// Wait one second before beginning the animation.
-setTimeout(function(){this.playSequence(this.playerLevel).then(function(){this.pauseInput=false}.bind(this))}.bind(this),1000)},checkInput:function checkInput(inputArray){// Checks that the input array matches the current sequence up to
+this.setLevelField();this.setStrictField();this.pauseInput=true;// Wait 1.5 seconds before beginning the animation.
+setTimeout(function(){this.playSequence(this.playerLevel).then(function(){this.pauseInput=false}.bind(this))}.bind(this),1500)},checkInput:function checkInput(inputArray){// Checks that the input array matches the current sequence up to
 // its length. Returns true if it matches, else returns false.
 for(var i=0,len=inputArray.length;i<len;i++){if(inputArray[i]===this.sequence[i]){continue}return false}return true},resetPlayerInput:function resetPlayerInput(){// Clears the player's input array.
 this.playerSequence=[]},input:function input(color){// Validate input before adding it on to (a copy of) the user sequence.
@@ -23,14 +23,14 @@ this.doFailureState();return false}},increasePlayerLevel:function increasePlayer
 this.playerLevel++;this.resetPlayerInput();if(this.playerLevel>=20){this.setupGame();return}this.playCurrentLevel()},doFailureState:function doFailureState(){// Determine the penalty for an incorrect input. If strict mode is on,
 // reset the game entirely. Otherwise, just clear the player's input
 // array.
-if(this.strictMode){this.setupGame();return}this.resetPlayerInput();this.playCurrentLevel()},// Game/DOM Interface
+if(this.strictMode){this.resetGame();return}this.resetPlayerInput();this.playCurrentLevel()},// Game/DOM Interface
 init:function init(){// Captures relevant DOM elements, and sets up listeners.
 var colorButtons=document.querySelectorAll(".button");for(var i=0,len=colorButtons.length;i<len;i++){var btn=colorButtons[i];btn.addEventListener("touchstart",this.handleColorInput.bind(this,btn.id,true));btn.addEventListener("mousedown",this.handleColorInput.bind(this,btn.id))}var mainBtn=document.querySelector("#info-main-btn");mainBtn.addEventListener("click",this.handleMainBtn.bind(this));var strictBtn=document.querySelector("#info-strict");strictBtn.addEventListener("click",this.handleStrictBtn.bind(this))},initSounds:function initSounds(){// Loads in the game's sound effects.
 // Retuns a promise that resolves when all sounds have loaded.
 if(this.gameSounds.loaded||this.gameSounds.loading){return}if(typeof Howl!="function"){return Promise.reject(new Error("Sound effects require Howler.js to be loaded"))}var sounds=this.colors.concat("wrong");var srcs={green:"assets/sounds/NFF-good-tip-high",red:"assets/sounds/NFF-good-tip-low",yellow:"assets/sounds/NFF-good-tip-high-2",blue:"assets/sounds/NFF-good-tip-low-2",wrong:"assets/sounds/NFF-wrong"};for(var src in srcs){if(srcs.hasOwnProperty(src)){var paths=[srcs[src]+".mp3",srcs[src]+".ogg"];this.gameSounds[src]=new Howl({src:paths})}}this.gameSounds.loading=true;var promises=[];var game=this;var _loop=function _loop(i,len){promises.push(new Promise(function(resolve,reject){game.gameSounds[sounds[i]].once("load",function(){resolve(true)})}))};for(var i=0,len=sounds.length;i<len;i++){_loop(i,len)}return new Promise(function(resolve,reject){Promise.all(promises).then(function(){game.gameSounds.loading=false;game.gameSounds.loaded=true;resolve(true)})})},setMainBtn:function setMainBtn(msg){document.querySelector("#info-main-btn").innerHTML=msg},setLevelField:function setLevelField(){var level=this.playerLevel||0;document.querySelector("#info-level").innerHTML=level},setStrictField:function setStrictField(){var res="Strict Mode "+(this.strictMode?"On":"Off");document.querySelector("#info-strict").innerHTML=res},// Input Handling
 handleMainBtn:function handleMainBtn(){// If the game has not been started yet, load in the game sounds
 // and start the game.
-if(!this.started){this.startGame()}else{if(this.resetting){return}this.resetGame()}},handleStrictBtn:function handleStrictBtn(){this.strictMode=!this.strictMode;var msg="Strict Mode ";msg+=this.strictMode?"On":"Off";document.querySelector("#info-strict").innerHTML=msg},handleColorInput:function handleColorInput(input,isTouch){// Don't allow input if the game is currently paused.
+if(!this.started){this.startGame()}else{if(this.resetting){return}this.resetGame()}},handleStrictBtn:function handleStrictBtn(){this.strictMode=!this.strictMode;var btn=document.querySelector("#info-strict");var classes=this.strictMode?"strict":"";var msg="Strict Mode ";msg+=this.strictMode?"On":"Off";btn.innerHTML=msg;btn.setAttribute("class",classes)},handleColorInput:function handleColorInput(input,isTouch){// Don't allow input if the game is currently paused.
 // Returns true if the input was sucessful.
 if(this.pauseInput||this.touchTimeout){return false}// If the event was a touchstart, prevent further color button inputs
 // for a short time, to prevent accidental double inputs on sensitve
