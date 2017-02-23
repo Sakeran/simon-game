@@ -3,6 +3,9 @@ let GAME = {
   started: false,
   pauseInput: true,
   gameSounds: {loaded: false, loading: false},
+  animationId: -1,
+  resetting: false,
+  touchTimeout: false,
 
   // Basic Game Logic
 
@@ -19,6 +22,31 @@ let GAME = {
     this.playCurrentLevel();
   },
 
+  startGame: function startGame() {
+    // Starts the game for the first time.
+    this.started = true;
+    this.setMainBtn("Loading...");
+    let game = this;
+    this.initSounds()
+    .then(function() {
+      game.setMainBtn("Reset");
+      game.setupGame();
+    });
+  },
+
+  resetGame: function resetGame() {
+    // Pause for 1.5 seconds before starting a new game.
+    this.pauseInput = true;
+    this.resetting = true;
+    this.animationId = -1;
+    this.setMainBtn("Loading...");
+    setTimeout(function() {
+      this.setupGame();
+      this.setMainBtn("Reset");
+      this.resetting = false;
+    }.bind(this), 1500);
+  },
+
   playCurrentLevel: function playCurrentLevel() {
     // Sets pauseInput to true while the current level sequence plays,
     // then sets it back to false to allow input.
@@ -29,7 +57,8 @@ let GAME = {
     this.pauseInput = true;
     // Wait one second before beginning the animation.
     setTimeout(function() {
-      this.playSequence(this.playerLevel).then(function() {
+      this.playSequence(this.playerLevel)
+      .then(function() {
         this.pauseInput = false;
       }.bind(this));
     }.bind(this), 1000);
@@ -114,12 +143,14 @@ let GAME = {
     for (let i = 0, len = colorButtons.length; i < len; i++) {
       let btn = colorButtons[i];
       btn.addEventListener("touchstart",
-        this.handleColorInput.bind(this, btn.id));
+        this.handleColorInput.bind(this, btn.id, true));
       btn.addEventListener("mousedown",
         this.handleColorInput.bind(this, btn.id));
     }
     let mainBtn = document.querySelector("#info-main-btn");
     mainBtn.addEventListener("click", this.handleMainBtn.bind(this));
+    let strictBtn = document.querySelector("#info-strict");
+    strictBtn.addEventListener("click", this.handleStrictBtn.bind(this));
   },
 
   initSounds: function initSounds() {
@@ -128,28 +159,30 @@ let GAME = {
     if (this.gameSounds.loaded || this.gameSounds.loading) {
       return;
     }
+    if (typeof Howl != "function") {
+      return Promise.reject(new Error(
+        "Sound effects require Howler.js to be loaded")
+      );
+    }
     let sounds = this.colors.concat("wrong");
     let srcs = {
-      green: "assets/sounds/NFF-good-tip-high.mp3",
-      red: "assets/sounds/NFF-good-tip-low.mp3",
-      yellow: "assets/sounds/NFF-good-tip-high-2.mp3",
-      blue: "assets/sounds/NFF-good-tip-low-2.mp3",
-      wrong: "assets/sounds/NFF-wrong.mp3",
+      green: "assets/sounds/NFF-good-tip-high",
+      red: "assets/sounds/NFF-good-tip-low",
+      yellow: "assets/sounds/NFF-good-tip-high-2",
+      blue: "assets/sounds/NFF-good-tip-low-2",
+      wrong: "assets/sounds/NFF-wrong",
     };
-    this.gameSounds.green = new Audio();
-    this.gameSounds.green.play();
-
-    this.gameSounds.red = new Audio();
-    this.gameSounds.red.play();
-
-    this.gameSounds.yellow = new Audio();
-    this.gameSounds.yellow.play();
-
-    this.gameSounds.blue = new Audio();
-    this.gameSounds.blue.play();
-
-    this.gameSounds.wrong = new Audio();
-    this.gameSounds.wrong.play();
+    for (let src in srcs) {
+      if (srcs.hasOwnProperty(src)) {
+        let paths = [
+          srcs[src] + ".mp3",
+          srcs[src] + ".ogg",
+        ];
+        this.gameSounds[src] = new Howl({
+          src: paths,
+        });
+      }
+    }
 
     this.gameSounds.loading = true;
     let promises = [];
@@ -157,10 +190,9 @@ let GAME = {
     for (let i = 0, len = sounds.length; i < len; i++) {
       promises.push(
         new Promise(function(resolve, reject) {
-          game.gameSounds[sounds[i]].oncanplaythrough = function() {
+          game.gameSounds[sounds[i]].once("load", function() {
             resolve(true);
-          };
-          game.gameSounds[sounds[i]].src = srcs[sounds[i]];
+          });
         })
       );
     }
@@ -194,28 +226,39 @@ let GAME = {
     // If the game has not been started yet, load in the game sounds
     // and start the game.
     if (!this.started) {
-      this.started = true;
-      this.setMainBtn("Loading...");
-      let game = this;
-      this.initSounds()
-      .then(function() {
-        game.setMainBtn("Reset");
-        game.setupGame();
-      });
+      this.startGame();
     } else {
-      // Reset the game.
-      this.setupGame();
+      if (this.resetting) {
+        return;
+      }
+      this.resetGame();
     }
   },
 
-  handleColorInput: function handleColorInput(input) {
+  handleStrictBtn: function handleStrictBtn() {
+    this.strictMode = !this.strictMode;
+    let msg = "Strict Mode ";
+    msg += this.strictMode ? "On" : "Off";
+    document.querySelector("#info-strict").innerHTML = msg;
+  },
+
+  handleColorInput: function handleColorInput(input, isTouch) {
     // Don't allow input if the game is currently paused.
     // Returns true if the input was sucessful.
-    if (this.pauseInput) {
+    if (this.pauseInput || this.touchTimeout) {
       return false;
     }
+    // If the event was a touchstart, prevent further color button inputs
+    // for a short time, to prevent accidental double inputs on sensitve
+    // screens that might lead to accidental player loss.
+    if (isTouch) {
+      this.touchTimeout = true;
+      console.log("touch timeout");
+      setTimeout(function() {
+        this.touchTimeout = false;
+      }.bind(this), 300);
+    }
     this.animateButton(input);
-    console.log(input);
     let correct = this.input(input);
     // If the result was valid (correct), call inputSucceed()
     // Otherwise, play the failure sound and call inputFail()
@@ -266,10 +309,9 @@ let GAME = {
     return new Promise(function(resolve, reject) {
       // Clear the "active" class after a short interval.
       setTimeout(function() {
-        if (target.getAttribute("class") == baseClasses) {
-          return;
+        if (target.getAttribute("class") != baseClasses) {
+          target.setAttribute("class", baseClasses);
         }
-        target.setAttribute("class", baseClasses);
         resolve(true);
       }, 600);
     });
@@ -286,9 +328,17 @@ let GAME = {
     speed = Math.floor(speed*1000) || 1000;
     let game = this;
     let animations = [];
+    let animId = Math.floor(Math.random() * 10000);
+    this.animationId = animId;
     for (let i = 0; i < level; i++) {
       animations.push(new Promise(function(resolve, reject) {
         setTimeout(function() {
+          // If the animation id has changed (thanks to a reset, etc),
+          // don't play the animation.
+          if (game.animationId != animId) {
+            resolve(false);
+            return;
+          }
           game.playSound(sequence[i]);
           game.animateButton(sequence[i])
           .then(function() {
@@ -305,9 +355,6 @@ let GAME = {
     if (this.gameSounds.hasOwnProperty(sound)) {
       // Play the given sound.
       let curSound = this.gameSounds[sound];
-      if (!curSound.paused) {
-        curSound.pause();
-      }
       curSound.currentTime = 0;
       curSound.play();
     }
